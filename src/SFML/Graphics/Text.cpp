@@ -311,11 +311,8 @@ Vector2f Text::findCharacterPos(std::size_t index) const
     updateLineOffsets();
 
     // Precompute the variables needed by the algorithm
-    const bool  isBold          = m_style & Bold;
-    float       whitespaceWidth = m_font->getGlyph(U' ', m_characterSize, isBold).advance;
-    const float letterSpacing   = (whitespaceWidth / 3.f) * (m_letterSpacingFactor - 1.f);
-    whitespaceWidth += letterSpacing;
-    const float lineSpacing = m_font->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
+    const bool isBold                                        = m_style & Bold;
+    const auto [whitespaceWidth, letterSpacing, lineSpacing] = getSpacing();
 
     // Compute the position
     Vector2f      position(m_lineOffsets[0], 0.f); // There will always be at least one line
@@ -428,12 +425,9 @@ void Text::ensureGeometryUpdate() const
     const float     strikeThroughOffset = xBounds.top + xBounds.height / 2.f;
 
     // Precompute the variables needed by the algorithm
-    float       whitespaceWidth = m_font->getGlyph(U' ', m_characterSize, isBold).advance;
-    const float letterSpacing   = (whitespaceWidth / 3.f) * (m_letterSpacingFactor - 1.f);
-    whitespaceWidth += letterSpacing;
-    const float lineSpacing = m_font->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
-    float       x           = m_lineOffsets[0]; // there will always be at least one line
-    auto        y           = static_cast<float>(m_characterSize);
+    const auto [whitespaceWidth, letterSpacing, lineSpacing] = getSpacing();
+    float x = m_lineOffsets[0]; // there will always be at least one line
+    auto  y = static_cast<float>(m_characterSize);
 
     // Create one quad for each character
     auto          minX             = static_cast<float>(m_characterSize);
@@ -585,11 +579,8 @@ void Text::updateLineOffsets() const
     std::vector<float> lineWidths;
 
     // Precompute the variables needed by the algorithm
-    const bool  isBold          = m_style & Bold;
-    float       whitespaceWidth = m_font->getGlyph(U' ', m_characterSize, isBold).advance;
-    const float letterSpacing   = (whitespaceWidth / 3.f) * (m_letterSpacingFactor - 1.f);
-    whitespaceWidth += letterSpacing;
-    const float lineSpacing = m_font->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
+    const bool isBold                                        = m_style & Bold;
+    const auto [whitespaceWidth, letterSpacing, lineSpacing] = getSpacing();
 
     Vector2f      position;
     std::uint32_t prevChar = 0;
@@ -645,6 +636,18 @@ void Text::updateLineOffsets() const
                 break;
         }
     }
+}
+
+
+////////////////////////////////////////////////////////////
+Text::Spacing Text::getSpacing() const
+{
+    const bool  isBold          = m_style & Bold;
+    float       whitespaceWidth = m_font->getGlyph(U' ', m_characterSize, isBold).advance;
+    const float letterSpacing   = (whitespaceWidth / 3.f) * (m_letterSpacingFactor - 1.f);
+    whitespaceWidth += letterSpacing;
+    const float lineSpacing = m_font->getLineSpacing(m_characterSize) * m_lineSpacingFactor;
+    return {whitespaceWidth, letterSpacing, lineSpacing};
 }
 
 } // namespace sf
