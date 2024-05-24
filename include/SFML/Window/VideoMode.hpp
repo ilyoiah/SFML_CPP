@@ -61,42 +61,6 @@ public:
     explicit VideoMode(const Vector2u& modeSize, unsigned int modeBitsPerPixel = 32);
 
     ////////////////////////////////////////////////////////////
-    /// \brief Get the current desktop video mode
-    ///
-    /// \return Current desktop video mode
-    ///
-    ////////////////////////////////////////////////////////////
-    static VideoMode getDesktopMode();
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Retrieve all the video modes supported in fullscreen mode
-    ///
-    /// When creating a fullscreen window, the video mode is restricted
-    /// to be compatible with what the graphics driver and monitor
-    /// support. This function returns the complete list of all video
-    /// modes that can be used in fullscreen mode.
-    /// The returned array is sorted from best to worst, so that
-    /// the first element will always give the best mode (higher
-    /// width, height and bits-per-pixel).
-    ///
-    /// \return Array containing all the supported fullscreen modes
-    ///
-    ////////////////////////////////////////////////////////////
-    static const std::vector<VideoMode>& getFullscreenModes();
-
-    ////////////////////////////////////////////////////////////
-    /// \brief Tell whether or not the video mode is valid
-    ///
-    /// The validity of video modes is only relevant when using
-    /// fullscreen windows; otherwise any video mode can be used
-    /// with no restriction.
-    ///
-    /// \return True if the video mode is valid for fullscreen mode
-    ///
-    ////////////////////////////////////////////////////////////
-    bool isValid() const;
-
-    ////////////////////////////////////////////////////////////
     // Member data
     ////////////////////////////////////////////////////////////
     Vector2u     size;           //!< Video mode width and height, in pixels
@@ -192,33 +156,6 @@ SFML_WINDOW_API bool operator>=(const VideoMode& left, const VideoMode& right);
 /// and the graphics card support), otherwise your window
 /// creation will just fail.
 ///
-/// sf::VideoMode provides a static function for retrieving
-/// the list of all the video modes supported by the system:
-/// getFullscreenModes().
-///
-/// A custom video mode can also be checked directly for
-/// fullscreen compatibility with its isValid() function.
-///
-/// Additionally, sf::VideoMode provides a static function
-/// to get the mode currently used by the desktop: getDesktopMode().
-/// This allows to build windows with the same size or pixel
-/// depth as the current resolution.
-///
-/// Usage example:
-/// \code
-/// // Display the list of all the video modes available for fullscreen
-/// std::vector<sf::VideoMode> modes = sf::VideoMode::getFullscreenModes();
-/// for (std::size_t i = 0; i < modes.size(); ++i)
-/// {
-///     sf::VideoMode mode = modes[i];
-///     std::cout << "Mode #" << i << ": "
-///               << mode.width << "x" << mode.height << " - "
-///               << mode.bitsPerPixel << " bpp" << std::endl;
-/// }
-///
-/// // Create a window with the same pixel depth as the desktop
-/// sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-/// window.create(sf::VideoMode({1024, 768}, desktop.bitsPerPixel), "SFML window");
-/// \endcode
+/// See also: sf::Monitor.
 ///
 ////////////////////////////////////////////////////////////

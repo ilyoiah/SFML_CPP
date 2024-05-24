@@ -27,30 +27,48 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-
-#include <SFML/Window/Clipboard.hpp>
-#include <SFML/Window/Context.hpp>
-#include <SFML/Window/ContextSettings.hpp>
-#include <SFML/Window/Cursor.hpp>
-#include <SFML/Window/Event.hpp>
-#include <SFML/Window/Joystick.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Window/Monitor.hpp>
-#include <SFML/Window/Mouse.hpp>
-#include <SFML/Window/Sensor.hpp>
-#include <SFML/Window/Touch.hpp>
-#include <SFML/Window/VideoMode.hpp>
-#include <SFML/Window/Window.hpp>
-#include <SFML/Window/WindowEnums.hpp>
-#include <SFML/Window/WindowHandle.hpp>
-
-#include <SFML/System.hpp>
+#include <memory>
+#include <vector>
 
 
+namespace sf
+{
+class VideoMode;
+
+namespace priv
+{
 ////////////////////////////////////////////////////////////
-/// \defgroup window Window module
-///
-/// Provides OpenGL-based windows, and abstractions for
-/// events and input handling.
+/// \brief OS-specific implementation of video modes functions
 ///
 ////////////////////////////////////////////////////////////
+class MonitorImpl
+{
+public:
+    ////////////////////////////////////////////////////////////
+    /// \brief Create primary monitor implementation
+    ///
+    /// \return Pointer to the created primary monitor implementation
+    ///
+    ////////////////////////////////////////////////////////////
+    static std::unique_ptr<MonitorImpl> createPrimaryMonitor() = delete;
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Get the list of all the supported fullscreen video modes of this monitor
+    ///
+    /// \return Array filled with the fullscreen video modes of this monitor
+    ///
+    ////////////////////////////////////////////////////////////
+    std::vector<VideoMode> getFullscreenModes() = delete;
+
+    ////////////////////////////////////////////////////////////
+    /// \brief Get the current desktop video mode of this monitor
+    ///
+    /// \return Current desktop video mode of this monitor
+    ///
+    ////////////////////////////////////////////////////////////
+    VideoMode getDesktopMode() = delete;
+};
+
+} // namespace priv
+
+} // namespace sf

@@ -26,7 +26,8 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Window/VideoModeImpl.hpp>
+#include <SFML/Window/VideoMode.hpp>
+#include <SFML/Window/macOS/MonitorImplCocoa.hpp>
 #include <SFML/Window/macOS/cg_sf_conversion.hpp>
 
 #include <SFML/System/Err.hpp>
@@ -36,9 +37,19 @@
 
 namespace sf::priv
 {
+////////////////////////////////////////////////////////////
+MonitorImplCocoa::MonitorImplCocoa() = default;
+
 
 ////////////////////////////////////////////////////////////
-std::vector<VideoMode> VideoModeImpl::getFullscreenModes()
+std::unique_ptr<MonitorImpl> MonitorImplCocoa::createPrimaryMonitor()
+{
+    return std::make_unique<MonitorImplCocoa>();
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<VideoMode> MonitorImplCocoa::getFullscreenModes()
 {
     std::vector<VideoMode> modes;
 
@@ -78,7 +89,7 @@ std::vector<VideoMode> VideoModeImpl::getFullscreenModes()
 
 
 ////////////////////////////////////////////////////////////
-VideoMode VideoModeImpl::getDesktopMode()
+VideoMode MonitorImplCocoa::getDesktopMode()
 {
     VideoMode mode; // RVO
 

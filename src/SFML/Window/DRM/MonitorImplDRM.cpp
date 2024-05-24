@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2013 Jonathan De Wachter (dewachter.jonathan@gmail.com)
+// Copyright (C) 2024 Andrew Mickelson
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -25,34 +25,55 @@
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
-#include <SFML/Window/VideoModeImpl.hpp>
+#include <SFML/Window/DRM/DRMContext.hpp>
+#include <SFML/Window/DRM/MonitorImplDRM.hpp>
+#include <SFML/Window/VideoMode.hpp>
 
-#include <SFML/System/Android/Activity.hpp>
-#include <SFML/System/Sleep.hpp>
-#include <SFML/System/Vector2.hpp>
+#include <SFML/System/Err.hpp>
 
-#include <mutex>
 
 namespace sf::priv
 {
 ////////////////////////////////////////////////////////////
-std::vector<VideoMode> VideoModeImpl::getFullscreenModes()
-{
-    const VideoMode desktop = getDesktopMode();
+MonitorImplDRM::MonitorImplDRM() = default;
 
-    // Return both portrait and landscape resolutions
-    return {desktop, VideoMode(Vector2u(desktop.size.y, desktop.size.x), desktop.bitsPerPixel)};
+
+////////////////////////////////////////////////////////////
+std::unique_ptr<MonitorImpl> MonitorImplDRM::createPrimaryMonitor()
+{
+    return std::make_unique<MonitorImplDRM>();
 }
 
 
 ////////////////////////////////////////////////////////////
-VideoMode VideoModeImpl::getDesktopMode()
+std::vector<VideoMode> MonitorImplDRM::getFullscreenModes()
 {
-    // Get the activity states
-    priv::ActivityStates& states = priv::getActivity();
-    const std::lock_guard lock(states.mutex);
+    std::vector<VideoMode> modes;
 
-    return VideoMode(Vector2u(states.screenSize));
+    const Drm&          drm  = DRMContext::getDRM();
+    drmModeConnectorPtr conn = drm.savedConnector;
+
+    if (conn)
+    {
+        for (int i = 0; i < conn->count_modes; i++)
+            modes.push_back(VideoMode({conn->modes[i].hdisplay, conn->modes[i].vdisplay}));
+    }
+    else
+        modes.push_back(getDesktopMode());
+
+    return modes;
+}
+
+
+////////////////////////////////////////////////////////////
+VideoMode MonitorImplDRM::getDesktopMode()
+{
+    const Drm&         drm = DRMContext::getDRM();
+    drmModeModeInfoPtr ptr = drm.mode;
+    if (ptr)
+        return VideoMode({ptr->hdisplay, ptr->vdisplay});
+    else
+        return VideoMode({0, 0});
 }
 
 } // namespace sf::priv

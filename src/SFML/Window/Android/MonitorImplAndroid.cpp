@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////
 //
 // SFML - Simple and Fast Multimedia Library
-// Copyright (C) 2007-2024 Laurent Gomila (laurent@sfml-dev.org)
+// Copyright (C) 2013 Jonathan De Wachter (dewachter.jonathan@gmail.com)
 //
 // This software is provided 'as-is', without any express or implied warranty.
 // In no event will the authors be held liable for any damages arising from the use of this software.
@@ -22,40 +22,49 @@
 //
 ////////////////////////////////////////////////////////////
 
-#pragma once
-
 ////////////////////////////////////////////////////////////
 // Headers
 ////////////////////////////////////////////////////////////
+#include <SFML/Window/Android/MonitorImplAndroid.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
-#include <vector>
+#include <SFML/System/Android/Activity.hpp>
+#include <SFML/System/Sleep.hpp>
+#include <SFML/System/Vector2.hpp>
 
+#include <mutex>
 
 namespace sf::priv
 {
 ////////////////////////////////////////////////////////////
-/// \brief OS-specific implementation of video modes functions
-///
-////////////////////////////////////////////////////////////
-class VideoModeImpl
-{
-public:
-    ////////////////////////////////////////////////////////////
-    /// \brief Get the list of all the supported fullscreen video modes
-    ///
-    /// \return Array filled with the fullscreen video modes
-    ///
-    ////////////////////////////////////////////////////////////
-    static std::vector<VideoMode> getFullscreenModes();
+MonitorImplAndroid::MonitorImplAndroid() = default;
 
-    ////////////////////////////////////////////////////////////
-    /// \brief Get the current desktop video mode
-    ///
-    /// \return Current desktop video mode
-    ///
-    ////////////////////////////////////////////////////////////
-    static VideoMode getDesktopMode();
-};
+
+////////////////////////////////////////////////////////////
+std::unique_ptr<MonitorImpl> MonitorImplAndroid::createPrimaryMonitor()
+{
+    return std::make_unique<MonitorImplAndroid>();
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<VideoMode> MonitorImplAndroid::getFullscreenModes()
+{
+    const VideoMode desktop = getDesktopMode();
+
+    // Return both portrait and landscape resolutions
+    return {desktop, VideoMode(Vector2u(desktop.size.y, desktop.size.x), desktop.bitsPerPixel)};
+}
+
+
+////////////////////////////////////////////////////////////
+VideoMode MonitorImplAndroid::getDesktopMode()
+{
+    // Get the activity states
+    priv::ActivityStates& states = priv::getActivity();
+    const std::lock_guard lock(states.mutex);
+
+    return VideoMode(Vector2u(states.screenSize));
+}
 
 } // namespace sf::priv

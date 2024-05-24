@@ -26,6 +26,7 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Window/GlContext.hpp>
+#include <SFML/Window/Monitor.hpp>
 #include <SFML/Window/Window.hpp>
 #include <SFML/Window/WindowImpl.hpp>
 
@@ -110,7 +111,7 @@ void Window::create(WindowHandle handle, const ContextSettings& settings)
     WindowBase::create(handle);
 
     // Recreate the context
-    m_context = priv::GlContext::create(settings, *m_impl, VideoMode::getDesktopMode().bitsPerPixel);
+    m_context = priv::GlContext::create(settings, *m_impl, Monitor::getPrimaryMonitor().getDesktopMode().bitsPerPixel);
 
     // Perform common initializations
     initialize();

@@ -26,8 +26,9 @@
 // Headers
 ////////////////////////////////////////////////////////////
 #include <SFML/Window/Unix/Display.hpp>
+#include <SFML/Window/Unix/MonitorImplX11.hpp>
 #include <SFML/Window/Unix/Utils.hpp>
-#include <SFML/Window/VideoModeImpl.hpp>
+#include <SFML/Window/VideoMode.hpp>
 
 #include <SFML/System/Err.hpp>
 
@@ -35,6 +36,7 @@
 #include <X11/extensions/Xrandr.h>
 
 #include <algorithm>
+#include <memory>
 #include <ostream>
 
 
@@ -52,7 +54,18 @@ struct XDeleter<XRRScreenConfiguration>
 
 
 ////////////////////////////////////////////////////////////
-std::vector<VideoMode> VideoModeImpl::getFullscreenModes()
+MonitorImplX11::MonitorImplX11() = default;
+
+
+////////////////////////////////////////////////////////////
+std::unique_ptr<MonitorImpl> MonitorImplX11::createPrimaryMonitor()
+{
+    return std::make_unique<MonitorImplX11>();
+}
+
+
+////////////////////////////////////////////////////////////
+std::vector<VideoMode> MonitorImplX11::getFullscreenModes()
 {
     std::vector<VideoMode> modes;
 
@@ -130,7 +143,7 @@ std::vector<VideoMode> VideoModeImpl::getFullscreenModes()
 
 
 ////////////////////////////////////////////////////////////
-VideoMode VideoModeImpl::getDesktopMode()
+VideoMode MonitorImplX11::getDesktopMode()
 {
     VideoMode desktopMode;
 

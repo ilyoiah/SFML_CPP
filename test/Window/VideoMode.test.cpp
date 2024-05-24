@@ -1,3 +1,4 @@
+#include <SFML/Window/Monitor.hpp>
 #include <SFML/Window/VideoMode.hpp>
 
 #include <catch2/catch_test_macros.hpp>
@@ -42,14 +43,14 @@ TEST_CASE("[Window] sf::VideoMode", runDisplayTests())
 
     SECTION("getFullscreenModes()")
     {
-        const auto& modes = sf::VideoMode::getFullscreenModes();
+        const auto& modes = sf::Monitor::getPrimaryMonitor().getFullscreenModes();
         CHECK(std::is_sorted(modes.begin(), modes.end(), std::greater<>()));
     }
 
     SECTION("isValid()")
     {
         const sf::VideoMode videoMode;
-        CHECK(!videoMode.isValid());
+        CHECK(!sf::Monitor::getPrimaryMonitor().isValid(videoMode));
     }
 
     SECTION("Operators")
